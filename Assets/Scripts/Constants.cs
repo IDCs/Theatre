@@ -6,6 +6,9 @@ namespace Theatre
     public class Constants 
     {
         public const string GAME_THEATRE = "Theatre";
+        
+        public const float DEFAULT_HEAVY_WEIGHT = 10.0f;
+        public const float DEFAULT_MAXIMUM_DRAG_WEIGHT = 50.0f;
     }
 
     public class DefaultPaths
@@ -62,7 +65,7 @@ namespace Theatre
     public class Names
     {
         // List of commonly used names.
-
+        public const string NAME_HELD_OBJECT = "HeldObject";
     }
 
     public class ErrorStrings
