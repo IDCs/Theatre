@@ -30,7 +30,7 @@ public class MouseLook : MonoBehaviour {
 
 	float rotationY = 0F;
 
-	protected void Update ()
+	void Update ()
 	{
 		if (axes == RotationAxes.MouseXAndY)
 		{
@@ -54,7 +54,7 @@ public class MouseLook : MonoBehaviour {
 		}
 	}
 	
-	protected void Start ()
+	void Start ()
 	{
 		// Make the rigid body not change rotation
 		if (GetComponent<Rigidbody>())

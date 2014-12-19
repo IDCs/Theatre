@@ -30,7 +30,7 @@ public class CCameraController : MouseLook {
         string strFunction = "CCameraController::Start()";
 
         // Run the base class's start function.
-        base.Start();
+        //base.Start();
 
         // Get the held object gameobject.
         foreach ( Transform trObject in gameObject.GetComponentsInChildren< Transform >() )
@@ -64,7 +64,7 @@ public class CCameraController : MouseLook {
         if ( true == m_bAllowRotation )
         { 
             // Run the base class's update function.
-            base.Update();
+            //base.Update();
         }
 
         // Run the grip logic.
@@ -109,7 +109,7 @@ public class CCameraController : MouseLook {
     private void CheckForKeyboardInput()
     {
         // For error handling.
-        string strFunction = "CCameraController::CheckForKeyboardInput()";
+        //string strFunction = "CCameraController::CheckForKeyboardInput()";
 
         // We want to be able to rotate the held object if the X key is held down.
         if ( true == Input.GetKey( KeyCode.X ) )
