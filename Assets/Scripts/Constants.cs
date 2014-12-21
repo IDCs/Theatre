@@ -60,6 +60,7 @@ namespace Theatre
         public const string TAG_WALL = "Wall";
         public const string TAG_AUDIO_CONTROLLER = "AudioController";
         public const string TAG_AUDIO = "Audio";
+        public const string TAG_SCENERY = "Scenery";
     }
 
     public class Names

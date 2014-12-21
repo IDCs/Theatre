@@ -30,7 +30,7 @@ public class CCameraController : MouseLook {
         string strFunction = "CCameraController::Start()";
 
         // Run the base class's start function.
-        //base.Start();
+        base.Start();
 
         // Get the held object gameobject.
         foreach ( Transform trObject in gameObject.GetComponentsInChildren< Transform >() )
@@ -64,7 +64,7 @@ public class CCameraController : MouseLook {
         if ( true == m_bAllowRotation )
         { 
             // Run the base class's update function.
-            //base.Update();
+            base.Update();
         }
 
         // Run the grip logic.
@@ -98,7 +98,11 @@ public class CCameraController : MouseLook {
         }
         else if ( Input.GetMouseButtonUp( Controls.CONTROL_MOUSE_LEFT_BUTTON ) )
         {
-            // Release the interactable object ( if any. )
+            // We're not holding anything, return.
+            if ( null == m_goInteractableObject )
+                return;
+
+            // Release the interactable object.
             ReleaseObject();
         }
     }
@@ -193,7 +197,7 @@ public class CCameraController : MouseLook {
         // Check if we have an interactable object in front of us.
         //  Additionally, we don't want to proceed if the camera controller couldn't
         //  find the dragged gameobject.
-        if ( null == m_goInteractableObject || false == m_bRunDragLogic )
+        if ( null == m_goInteractableObject || false == m_bRunDragLogic || m_goInteractableObject.tag == Tags.TAG_SCENERY )
             return;
         
         // Get a handle on the object script
@@ -227,7 +231,7 @@ public class CCameraController : MouseLook {
     void ReleaseObject()
     {
         // Check if the drag logic is enabled before we proceed
-        if ( false == m_bRunDragLogic )
+        if ( false == m_bRunDragLogic || m_goInteractableObject.tag == Tags.TAG_SCENERY )
             return;
 
         // Retrieve the held objects ( This should be only 1 object )
