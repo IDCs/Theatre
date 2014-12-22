@@ -10,7 +10,8 @@ public class lightControl : MonoBehaviour
     {
         foreach (Light light in lightsToIgnore)
         {
-            light.enabled = false;
+            if ( null != light )
+                light.enabled = false;
         }
     }
 
@@ -18,7 +19,8 @@ public class lightControl : MonoBehaviour
     {
         foreach (Light light in lightsToIgnore)
         {
-            light.enabled = true;
+            if ( null != light )
+                light.enabled = true;
         }
     }
 }
