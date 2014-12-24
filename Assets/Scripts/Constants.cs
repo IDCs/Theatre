@@ -80,6 +80,7 @@ namespace Theatre
         public const string ERROR_UNMATCHED_AUDIO_CLIP = "Unable to match provided audio file to available patterns.";
         public const string ERROR_AUDIO_FILES_NOT_LOADED = "Audio Controller has indicated that it hasn't finished loading all audio files.";
         public const string ERROR_AUDIO_FAILED_RELOAD = "Could not load audio resources.";
+        public const string ERROR_SCENERY_TAG_NOT_FOUND = "SceneryController is attached to an incorrectly tagged object.";
     }
 
     public class ResourcePacks

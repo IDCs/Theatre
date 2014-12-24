@@ -21,6 +21,8 @@ public class CCameraController : MouseLook {
     private bool m_bAllowRotation = true;
     public bool AllowRotation { get { return m_bAllowRotation; } }
 
+    private List< GameObject > m_liSceneryObjects = new List< GameObject >();
+
     /////////////////////////////////////////////////////////////////////////////
     /// Function:               Start
     /////////////////////////////////////////////////////////////////////////////
@@ -60,15 +62,18 @@ public class CCameraController : MouseLook {
     /////////////////////////////////////////////////////////////////////////////
 	void Update ()
 	{
+        if ( m_liSceneryObjects.Count == 0 )
+            m_liSceneryObjects = CSceneryObject.SceneryObjects;
+
         // Check if we're allowed to run the camera rotation.
         if ( true == m_bAllowRotation )
         { 
             // Run the base class's update function.
             base.Update();
-        }
 
-        // Run the grip logic.
-        SearchForInteractables();
+            // Run the grip logic.
+            SearchForInteractables();
+        }
 	}
 
     /////////////////////////////////////////////////////////////////////////////
@@ -76,6 +81,7 @@ public class CCameraController : MouseLook {
     /////////////////////////////////////////////////////////////////////////////
     void FixedUpdate()
     {
+
         // Run logic that reacts to mouse events.
         //  This may include physics manipulation, so we want to run this within
         //  the fixed update function.
@@ -118,16 +124,26 @@ public class CCameraController : MouseLook {
         // We want to be able to rotate the held object if the X key is held down.
         if ( true == Input.GetKey( KeyCode.X ) )
         {
-            // Attempt to get a handle on the character motor and disable movement.
-            //CharacterMotor jsCharacterMotor = GetComponent< CharacterMotor >();
-            //if ( null == jsCharacterMotor )
-            //{
-            //    Debug.LogError( string.Format( "{0} {1}: {2}", strFunction, ErrorStrings.ERROR_MISSING_COMPONENT, typeof( CharacterMotor ).ToString() ) );
-            //    return;
-            //}
+            // MouseLook objects interfere with item rotation.
+            MouseLook[] rgMouseLookObjects = GetComponentsInChildren< MouseLook >();
+            for ( int i = 0; i < rgMouseLookObjects.Length; ++i )
+            {
+                // Disallow camera rotation.
+                rgMouseLookObjects[ i ].AllowRotation = false;
+            }
 
-            // Disallow the character to move.
-            //jsCharacterMotor.SetControllable( false );
+            // Get a handle on the item's rigidbody and ensure that gravity is disabled.
+            Rigidbody rbObject = m_goInteractableObject.rigidbody;
+            if ( null != rbObject )
+            {
+                rbObject.useGravity = false;
+            }
+
+            // Disable collisions for all scenery objects.
+            foreach ( GameObject goSceneryObject in m_liSceneryObjects )
+            {
+                Physics.IgnoreCollision( goSceneryObject.collider, m_goInteractableObject.collider, true );
+            }
 
             // Disallow camera rotation.
             m_bAllowRotation = false;
@@ -142,22 +158,31 @@ public class CCameraController : MouseLook {
 
             //rotate us over time according to speed until we are in the required rotation
             m_goInteractableObject.transform.Rotate( v3Direction );
+
         }
         else if ( true == Input.GetKeyUp( KeyCode.X ) )
         {
             m_bAllowRotation = true;
-            // Player has released the x key, act accordingly.
-            // Attempt to get a handle on the character motor and enable movement.
-            //CharacterMotor jsCharacterMotor = GetComponent< CharacterMotor >();
-            //if ( null == jsCharacterMotor )
-            //{
-            //    Debug.LogError( string.Format( "{0} {1}: {2}", strFunction, ErrorStrings.ERROR_MISSING_COMPONENT, typeof( CharacterMotor ).ToString() ) );
-            //    return;
-            //}
 
-            // Disallow the character to move.
-            //jsCharacterMotor.SetControllable( true );
+            // Get a handle on the item's rigidbody and ensure that gravity is enabled.
+            Rigidbody rbObject = m_goInteractableObject.rigidbody;
+            if ( null != rbObject )
+            {
+                rbObject.useGravity = true;
+            }
 
+            // We're done rotating, we can re-enable camera rotation.
+            MouseLook[] rgMouseLookObjects = GetComponentsInChildren< MouseLook >();
+            for ( int i = 0; i < rgMouseLookObjects.Length; ++i )
+            {
+                rgMouseLookObjects[ i ].AllowRotation = true;
+            }
+
+            // Enable collisions for all scenery objects.
+            foreach ( GameObject goSceneryObject in m_liSceneryObjects )
+            {
+                Physics.IgnoreCollision( goSceneryObject.collider, m_goInteractableObject.collider, false );
+            }
         }
     }
 
