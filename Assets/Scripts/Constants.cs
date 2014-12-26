@@ -86,6 +86,12 @@ namespace Theatre
         public const string ERROR_INVALID_OBJECT_ID = "Invalid object id.";
     }
 
+    public class WarningStrings
+    {
+        // Declare warning messages.
+        public const string WARNING_UNASSIGNED_VARIABLE = "The following variable has not been assigned in the inspector.";
+    }
+
     public class ItemDescriptions
     {
         // Declare item descriptions here.

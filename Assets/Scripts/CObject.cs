@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using Theatre;
@@ -13,6 +14,7 @@ public class CObject : MonoBehaviour {
     };
     public static Dictionary< string, string > ItemDescriptionMap { get { return m_dictDescriptionMap; } }
 
+    // A static container holding all active objects.
     private static List< GameObject > m_liActiveObjects = new List< GameObject >();
     public static List< GameObject > ActiveObjects { get { return m_liActiveObjects; } }
 
@@ -51,6 +53,10 @@ public class CObject : MonoBehaviour {
     private int m_iObjectID = Constants.DEFAULT_INVALID_OBJECT_ID;
     public int ObjectId { get { return m_iObjectID; } }
 
+    // The developer needs to assign a 2D image to the item.
+    [ SerializeField ]
+    private Sprite m_spItemSprite = null;
+
     /////////////////////////////////////////////////////////////////////////////
     /// Function:               Start
     /////////////////////////////////////////////////////////////////////////////
@@ -65,6 +71,7 @@ public class CObject : MonoBehaviour {
         //  2. Ensure that a rigidbody component is present.
         //  3. Check the item's weight and modify the object's attributes accordingly.
         //  4. Ensure that the object has a reference to the item's prefab for instantiation.
+        //  5. Inform the developer if he forgot to assign a 2D image for the UI.
 
         // Will indicate if this item needs an inventory information object.
         bool bIsCollectable = true;
@@ -99,6 +106,12 @@ public class CObject : MonoBehaviour {
             m_liObjectAttributes.Remove( EObjectAttributes.ATTRIBUTE_DRAGABLE );
         }
 
+        // Check if we assigned an image.
+        if ( null == m_spItemSprite )
+        {
+            Debug.LogWarning( string.Format( "", strFunction, WarningStrings.WARNING_UNASSIGNED_VARIABLE, "m_imgItem" ) );
+        }
+
         // We want to create this item's inventory item info object.
         if ( true == bIsCollectable )
         {
@@ -114,7 +127,8 @@ public class CObject : MonoBehaviour {
             m_cInventoryItemInfo = new InventoryItemInfo{ m_iObjectId = this.m_iObjectID, 
                                                           m_goItemPrefab = this.m_goItemPrefab, 
                                                           m_strDescription = m_dictDescriptionMap[ gameObject.name ], 
-                                                          m_strName = gameObject.name };
+                                                          m_strName = gameObject.name, 
+                                                          m_spSprite = this.m_spItemSprite };
         }
 
         // Add item to the active list.
@@ -149,4 +163,7 @@ public class InventoryItemInfo
 
     // Will hold the item prefab so we can instantiate it in the world.
     public GameObject m_goItemPrefab = null;
+
+    // The item sprite for the UI.
+    public Sprite m_spSprite;
 }
