@@ -9,6 +9,7 @@ namespace Theatre
         
         public const float DEFAULT_HEAVY_WEIGHT = 10.0f;
         public const float DEFAULT_MAXIMUM_DRAG_WEIGHT = 50.0f;
+        public const int DEFAULT_INVALID_OBJECT_ID = -666;
     }
 
     public class DefaultPaths
@@ -67,6 +68,7 @@ namespace Theatre
     {
         // List of commonly used names.
         public const string NAME_HELD_OBJECT = "HeldObject";
+        public const string NAME_CUBE = "Cube";
     }
 
     public class ErrorStrings
@@ -81,6 +83,13 @@ namespace Theatre
         public const string ERROR_AUDIO_FILES_NOT_LOADED = "Audio Controller has indicated that it hasn't finished loading all audio files.";
         public const string ERROR_AUDIO_FAILED_RELOAD = "Could not load audio resources.";
         public const string ERROR_SCENERY_TAG_NOT_FOUND = "SceneryController is attached to an incorrectly tagged object.";
+        public const string ERROR_INVALID_OBJECT_ID = "Invalid object id.";
+    }
+
+    public class ItemDescriptions
+    {
+        // Declare item descriptions here.
+        public const string ITEM_DESC_CUBE = "It's an amazing cube!";
     }
 
     public class ResourcePacks
