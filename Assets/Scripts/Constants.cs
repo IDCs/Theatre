@@ -10,6 +10,8 @@ namespace Theatre
         public const float DEFAULT_HEAVY_WEIGHT = 10.0f;
         public const float DEFAULT_MAXIMUM_DRAG_WEIGHT = 50.0f;
         public const int DEFAULT_INVALID_OBJECT_ID = -666;
+
+        public const int DEFAULT_MAX_INVENTORY_SLOTS = 10;
     }
 
     public class DefaultPaths
@@ -84,6 +86,13 @@ namespace Theatre
         public const string ERROR_AUDIO_FAILED_RELOAD = "Could not load audio resources.";
         public const string ERROR_SCENERY_TAG_NOT_FOUND = "SceneryController is attached to an incorrectly tagged object.";
         public const string ERROR_INVALID_OBJECT_ID = "Invalid object id.";
+    }
+
+    public class AnimatorValues
+    {
+        
+        // Inventory animator values
+        public const string ANIMATOR_TRIGGER_SHOW_INVENTORY = "triggerInventory";
     }
 
     public class WarningStrings

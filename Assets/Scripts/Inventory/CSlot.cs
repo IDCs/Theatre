@@ -62,7 +62,7 @@ public class CSlot : MonoBehaviour, IPointerDownHandler, IPointerEnterHandler {
     /////////////////////////////////////////////////////////////////////////////
     public void OnPointerDown( PointerEventData pointerEventData )
     {
-
+        Debug.Log("PointerDown");
     }
 
     /////////////////////////////////////////////////////////////////////////////
@@ -70,6 +70,6 @@ public class CSlot : MonoBehaviour, IPointerDownHandler, IPointerEnterHandler {
     /////////////////////////////////////////////////////////////////////////////
     public void OnPointerEnter( PointerEventData pointerEventData )
     {
-
+        Debug.Log("PointerEnter");
     }
 }
