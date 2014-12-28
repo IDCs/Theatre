@@ -85,16 +85,23 @@ public class NarrativeNode : MonoBehaviour
     #region EditorGizmos
     private void OnDrawGizmos()
     {
+        // Draw lines to all parents with marking showing the direction of the relationship
         foreach (NarrativeNode node in prerequisites)
         {
             if (node != null)
             {
                 Gizmos.color = Color.blue;
                 Gizmos.DrawLine(transform.position, node.transform.position);
+
+                Vector3 toChild = transform.position - node.transform.position;
+                Vector3 childIconPoint = transform.position - toChild * 0.3f;
+                Vector3 parentIconPoint = node.transform.position + toChild * 0.3f;
+
+                Gizmos.DrawIcon(childIconPoint, "C.png", false);
+                Gizmos.DrawIcon(parentIconPoint, "P.png", false);
             }
         }
     }
-
     #endregion
 
     // Queue managing playing of the node contents
