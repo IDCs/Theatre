@@ -10,4 +10,10 @@ public static class CustomMenuItems
     {
         ScriptableObjectUtility.CreateResource< CAudioSO >( ResourcePacks.RESOURCE_CONTAINER_AUDIO_OBJECTS );
     }
+
+    [MenuItem(DefaultPaths.SO_RESOURCES_PATH + DefaultPaths.SO_SUBTITLED_AUDIO)]
+    public static void CreateSubtitledAudio()
+    {
+        ScriptableObjectUtility.CreateResource<SubtitledAudio>();
+    }
 }

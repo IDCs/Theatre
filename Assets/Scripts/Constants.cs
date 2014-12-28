@@ -20,6 +20,7 @@ namespace Theatre
         // Will be used by the custom menu items script for resource creation.
         public const string SO_RESOURCES_PATH = "Theatre/Resources/";
         public const string SO_AUDIO = "Audio";
+        public const string SO_SUBTITLED_AUDIO = "Subtitled Audio";
         
         // Asset paths
         public const string PATH_RESOURCES = "Resources/";
