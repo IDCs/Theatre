@@ -11,7 +11,7 @@ public class NarrativeNode : MonoBehaviour
     private SubtitledAudio[] audioPlaylist = null;
     // All other nodes that need to be triggered before this one becomes active
     [SerializeField]
-    private NarrativeNode[] prerequisites = null; 
+    private NarrativeNode[] prerequisites = null;
 
     // Was this node previosuly triggered
     public bool Triggered { get; private set; }
@@ -22,7 +22,7 @@ public class NarrativeNode : MonoBehaviour
     public bool FinishedPlaying { get; private set; }
     // Called when this node finished playing all audio
     public System.Action OnNodeFinishedPlaying { get; set; }
-    
+
     private static NarrativeNodePlayQueue playQueue = null;
 
     // AudioSource component that will play the audio clips
@@ -52,7 +52,7 @@ public class NarrativeNode : MonoBehaviour
         {
             // Send out the trigger event
             Triggered = true;
-            if(OnNodeTriggered != null)
+            if (OnNodeTriggered != null)
             {
                 OnNodeTriggered();
             }
@@ -76,11 +76,26 @@ public class NarrativeNode : MonoBehaviour
 
         // Send out the completion event.
         FinishedPlaying = true;
-        if(OnNodeFinishedPlaying != null)
+        if (OnNodeFinishedPlaying != null)
         {
             OnNodeFinishedPlaying();
         }
     }
+
+    #region EditorGizmos
+    private void OnDrawGizmos()
+    {
+        foreach (NarrativeNode node in prerequisites)
+        {
+            if (node != null)
+            {
+                Gizmos.color = Color.blue;
+                Gizmos.DrawLine(transform.position, node.transform.position);
+            }
+        }
+    }
+
+    #endregion
 
     // Queue managing playing of the node contents
     private class NarrativeNodePlayQueue
@@ -101,7 +116,7 @@ public class NarrativeNode : MonoBehaviour
             // If the queue is not already running, start it now
             if (!IsQueuePlaying)
             {
-                node.StartCoroutine(PlayQueue());  
+                node.StartCoroutine(PlayQueue());
                 IsQueuePlaying = true;
             }
         }
@@ -109,11 +124,14 @@ public class NarrativeNode : MonoBehaviour
         // Play all the nodes currently in the queue
         private IEnumerator PlayQueue()
         {
-            foreach (NarrativeNode node in nodesToPlay)
+            while (nodesToPlay.Count > 0)
             {
+                NarrativeNode node = nodesToPlay.Dequeue();
                 yield return node.StartCoroutine(node.Play());
             }
+
             IsQueuePlaying = false;
+
         }
     }
 }
