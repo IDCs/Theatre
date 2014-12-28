@@ -14,6 +14,6 @@ public static class CustomMenuItems
     [MenuItem(DefaultPaths.SO_RESOURCES_PATH + DefaultPaths.SO_SUBTITLED_AUDIO)]
     public static void CreateSubtitledAudio()
     {
-        ScriptableObjectUtility.CreateResource<SubtitledAudio>();
+        ScriptableObjectUtility.CreateResource<DeceptionNarrative.SubtitledAudio>();
     }
 }

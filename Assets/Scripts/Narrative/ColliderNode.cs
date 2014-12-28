@@ -1,33 +1,36 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-/// <summary>
-/// A node using a collider to trigger NarrativeNode
-/// </summary>
-
-[RequireComponent(typeof(NarrativeNode), typeof(Collider))]
-public class ColliderNode : MonoBehaviour
+namespace DeceptionNarrative
 {
-    // NarrativeNode triggered by this element
-    private NarrativeNode narrativeNode = null;
+    /// <summary>
+    /// A node using a collider to trigger NarrativeNode
+    /// </summary>
 
-    void Start()
+    [RequireComponent(typeof(NarrativeNode), typeof(Collider))]
+    public class ColliderNode : MonoBehaviour
     {
-        narrativeNode = GetComponent<NarrativeNode>();
-    }
+        // NarrativeNode triggered by this element
+        private NarrativeNode narrativeNode = null;
 
-    private void OnTriggerEnter(Collider collider)
-    {
-        // If the player collided with the node, attempt to trigger it (the node does all the checks before triggering the narraive event)
-        if(collider.tag == Theatre.Tags.TAG_PLAYER)
+        void Start()
         {
-            narrativeNode.TriggerActivated();
+            narrativeNode = GetComponent<NarrativeNode>();
         }
 
-        // If the node has been activated, disable the collider, as it's no longer needed
-        if(narrativeNode.Triggered)
+        private void OnTriggerEnter(Collider collider)
         {
-            gameObject.collider.enabled = false;
+            // If the player collided with the node, attempt to trigger it (the node does all the checks before triggering the narraive event)
+            if (collider.tag == Theatre.Tags.TAG_PLAYER)
+            {
+                narrativeNode.TriggerActivated();
+            }
+
+            // If the node has been activated, disable the collider, as it's no longer needed
+            if (narrativeNode.Triggered)
+            {
+                gameObject.collider.enabled = false;
+            }
         }
     }
 }

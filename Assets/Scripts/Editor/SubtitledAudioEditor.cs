@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEditor;
 using System;
+using DeceptionNarrative;
 
 /// <summary>
 /// Custom Inspector for SubtitledAudio scriptable object.
