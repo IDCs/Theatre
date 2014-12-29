@@ -93,9 +93,15 @@ public class CInventory : MonoBehaviour {
             Debug.LogError( string.Format( "{0} {1}: {2}", strFunction, ErrorStrings.ERROR_MISSING_COMPONENT, typeof( Animator ).ToString() ) );
         }
 
+        float fScreenHeight = Screen.height;
+        float fScreenWidth = Screen.width;
+
+        RectTransform rtPanel = this.GetComponent< RectTransform >();
+        rtPanel.localPosition = new Vector3( 0f, 0f, 0f );
+
         // Get the size of the panel itself so we can evenly distribute the slots 
         //  according to panel size.
-        Rect rcPanelSize = this.GetComponent< RectTransform >().rect;
+        Rect rcPanelSize = rtPanel.rect;
 
         // Calculate rectangle offset.
         float fWidth = rcPanelSize.width;
@@ -123,10 +129,13 @@ public class CInventory : MonoBehaviour {
                 return;
             }
 
-            goSlot.transform.parent = this.transform;
+            goSlot.transform.SetParent( this.transform );
 
             // Apply X offset.
             goSlot.GetComponent< RectTransform >().localPosition = new Vector3( fXOffset, 0f, 0f );
+
+            // Modify the slot size.
+            goSlot.GetComponent< RectTransform >().localScale = new Vector3( 1f, 3f, 1f );
 
             // Jump to the next ideal position.
             fXOffset += fWidth / Constants.DEFAULT_MAX_INVENTORY_SLOTS;
@@ -186,5 +195,13 @@ public class CInventory : MonoBehaviour {
             return m_dictHashStates[ iNameHash ];
 
         return EInventoryState.STATE_NONE;
+    }
+
+    /////////////////////////////////////////////////////////////////////////////
+    /// Function:               AddToInventory
+    /////////////////////////////////////////////////////////////////////////////
+    public static void AddToInventory( InventoryItemInfo itemInfo )
+    {
+        
     }
 }

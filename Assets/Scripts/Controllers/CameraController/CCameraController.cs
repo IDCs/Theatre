@@ -142,7 +142,8 @@ public class CCameraController : MouseLook {
             // Disable collisions for all scenery objects.
             foreach ( GameObject goSceneryObject in m_liSceneryObjects )
             {
-                Physics.IgnoreCollision( goSceneryObject.collider, m_goInteractableObject.collider, true );
+                if ( goSceneryObject != m_goInteractableObject )
+                    Physics.IgnoreCollision( goSceneryObject.collider, m_goInteractableObject.collider, true );
             }
 
             // Disallow camera rotation.
@@ -181,7 +182,8 @@ public class CCameraController : MouseLook {
             // Enable collisions for all scenery objects.
             foreach ( GameObject goSceneryObject in m_liSceneryObjects )
             {
-                Physics.IgnoreCollision( goSceneryObject.collider, m_goInteractableObject.collider, false );
+                if ( goSceneryObject != m_goInteractableObject )
+                    Physics.IgnoreCollision( goSceneryObject.collider, m_goInteractableObject.collider, false );
             }
         }
     }
