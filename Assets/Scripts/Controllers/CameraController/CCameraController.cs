@@ -6,7 +6,21 @@ using Theatre;
 public class CCameraController : MouseLook {
 
     // Will hold the default position for all dragged objects.
-    private GameObject m_goDraggedObject = null;
+    private static GameObject m_goDraggedObject = null;
+    public static Vector3 HandsPosition 
+    { 
+        get 
+        { 
+            if ( null == m_goDraggedObject )
+            {
+                // This should never happen.
+                Debug.LogError( string.Format( "CCameraController::HandsPosition {0}: {1}", ErrorStrings.ERROR_NULL_OBJECT, "m_goDraggedObject" ) );
+                return Vector3.zero;
+            }
+
+            return m_goDraggedObject.transform.position; 
+        } 
+    }
 
     // Will hold a reference to the object which we're currently looking at.
     private GameObject m_goInteractableObject = null;
@@ -84,9 +98,8 @@ public class CCameraController : MouseLook {
     /////////////////////////////////////////////////////////////////////////////
     /// Function:               FixedUpdate
     /////////////////////////////////////////////////////////////////////////////
-    void FixedUpdate()
+    void FixedUpdate ()
     {
-
         // Run logic that reacts to mouse events.
         //  This may include physics manipulation, so we want to run this within
         //  the fixed update function.
@@ -99,11 +112,12 @@ public class CCameraController : MouseLook {
     /////////////////////////////////////////////////////////////////////////////
     /// Function:               CheckForMouseInput
     /////////////////////////////////////////////////////////////////////////////
-    private void CheckForMouseInput()
+    private void CheckForMouseInput ()
     {
         // Check for mouse input and react accordingly.
         if ( Input.GetMouseButtonDown( Controls.CONTROL_MOUSE_LEFT_BUTTON ) )
         {
+            // A click has occured, depending on 
             m_fClickTime = Time.time;
 
             // Drag the interactable object.
@@ -115,9 +129,62 @@ public class CCameraController : MouseLook {
             if ( null == m_goHeldObject )
                 return;
 
-            // Release the interactable object.
+            if ( m_fClickTime + 1f > Time.time )
+            {
+                // Attempt to add the item to inventory, AddToInventory will return
+                //  true or false depending if it succeeded.
+                bool bItemAdded = AddToInventory();
+
+                if ( true == bItemAdded )
+                { 
+                    // We managed to add the item to inventory, clean up and return.
+                    Destroy( m_goHeldObject );
+                    m_goHeldObject = null;
+
+                    return;
+                }
+            }
+
             ReleaseObject();
         }
+    }
+
+    /////////////////////////////////////////////////////////////////////////////
+    /// Function:               AddToInventory
+    /////////////////////////////////////////////////////////////////////////////
+    private bool AddToInventory ()
+    {
+        // Error reporting.
+        string strFunction = "CCameraController::AddToInventory()";
+
+        // We need to check the item's attributes and ensure that we can store it
+        //  in our inventory. It's safe to assume that we have a held object at this point
+        //  so we're not going to null check it.
+        CObject cObject = m_goHeldObject.GetComponent< CObject >();
+        if ( null == cObject )
+        {
+            Debug.LogError( string.Format( "{0} {1}: {2}", strFunction, ErrorStrings.ERROR_MISSING_COMPONENT, typeof( CObject ).ToString() ) );
+            return false;
+        }
+
+        // Check if the item is collectable.
+        if ( true == cObject.Attributes.Contains( CObject.EObjectAttributes.ATTRIBUTE_COLLECTABLE ) )
+        {
+            bool bItemAdded = CInventory.InventoryInstance.AddToInventory( cObject.InvItemInfo );
+
+            if ( true == bItemAdded )
+            { 
+                // TODO: Generate a collected item event here.
+            
+                return true;
+            }
+            else
+            {
+                // TODO: Inform the player that his inventory is full.
+            }
+        }
+
+        return false;
     }
 
     /////////////////////////////////////////////////////////////////////////////
@@ -181,7 +248,7 @@ public class CCameraController : MouseLook {
     /////////////////////////////////////////////////////////////////////////////
     /// Function:               CheckForKeyboardInput
     /////////////////////////////////////////////////////////////////////////////
-    private void CheckForKeyboardInput()
+    private void CheckForKeyboardInput ()
     {
         // Check if the user is trying to rotate a held object.
         if ( null != m_goHeldObject )
@@ -191,7 +258,7 @@ public class CCameraController : MouseLook {
     /////////////////////////////////////////////////////////////////////////////
     /// Function:               SearchForInteractables
     /////////////////////////////////////////////////////////////////////////////
-    private void SearchForInteractables()
+    private void SearchForInteractables ()
     {
         // Check if we want the drag logic to run.
         if ( false == m_bRunDragLogic )
@@ -216,7 +283,7 @@ public class CCameraController : MouseLook {
     /////////////////////////////////////////////////////////////////////////////
     /// Function:               DragObject
     /////////////////////////////////////////////////////////////////////////////
-    void DragObject()
+    void DragObject ()
     {
         // For error reporting.
         string strFunction = "CCameraController::OnMouseDown()";
@@ -258,7 +325,7 @@ public class CCameraController : MouseLook {
     /////////////////////////////////////////////////////////////////////////////
     /// Function:               ReleaseObject
     /////////////////////////////////////////////////////////////////////////////
-    void ReleaseObject()
+    void ReleaseObject ()
     {
         // Check if the drag logic is enabled before we proceed
         if ( false == m_bRunDragLogic )

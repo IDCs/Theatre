@@ -21,6 +21,7 @@ namespace Theatre
         public const string SO_RESOURCES_PATH = "Theatre/Resources/";
         public const string SO_AUDIO = "Audio";
         public const string SO_SUBTITLED_AUDIO = "Subtitled Audio";
+        public const string SO_OBJECTS = "Objects";
         
         // Asset paths
         public const string PATH_RESOURCES = "Resources/";
@@ -87,6 +88,7 @@ namespace Theatre
         public const string ERROR_AUDIO_FAILED_RELOAD = "Could not load audio resources.";
         public const string ERROR_SCENERY_TAG_NOT_FOUND = "SceneryController is attached to an incorrectly tagged object.";
         public const string ERROR_INVALID_OBJECT_ID = "Invalid object id.";
+        public const string ERROR_RESOURCE_PACK = "Resource pack could not be loaded.";
     }
 
     public class AnimatorValues
@@ -111,5 +113,6 @@ namespace Theatre
     public class ResourcePacks
     {
         public const string RESOURCE_CONTAINER_AUDIO_OBJECTS = "AudioResource";
+        public const string RESOURCE_CONTAINER_OBJECTS = "Objects";
     }
 }

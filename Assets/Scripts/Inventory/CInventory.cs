@@ -93,11 +93,8 @@ public class CInventory : MonoBehaviour {
             Debug.LogError( string.Format( "{0} {1}: {2}", strFunction, ErrorStrings.ERROR_MISSING_COMPONENT, typeof( Animator ).ToString() ) );
         }
 
-        float fScreenHeight = Screen.height;
-        float fScreenWidth = Screen.width;
-
+        // Get a handle on the panel's rect transform object.
         RectTransform rtPanel = this.GetComponent< RectTransform >();
-        rtPanel.localPosition = new Vector3( 0f, 0f, 0f );
 
         // Get the size of the panel itself so we can evenly distribute the slots 
         //  according to panel size.
@@ -200,8 +197,34 @@ public class CInventory : MonoBehaviour {
     /////////////////////////////////////////////////////////////////////////////
     /// Function:               AddToInventory
     /////////////////////////////////////////////////////////////////////////////
-    public static void AddToInventory( InventoryItemInfo itemInfo )
+    public bool AddToInventory( InventoryItemInfo itemInfo )
     {
-        
+        // Error reporting.
+        string strFunction = "CInventory::AddToInventory()";
+
+        // We're going to loop through all our slots and make sure that we have a free one.
+        foreach ( GameObject goSlot in m_liInventorySlots )
+        {
+            // Get a handle on the slot component and check if it's empty.
+            CSlot cSlot = goSlot.GetComponent< CSlot >();
+            if ( null == cSlot )
+            {
+                // The CSlot component is missing, jump to the next slot.
+                Debug.LogError( string.Format( "{0} {1}: {2}", strFunction, ErrorStrings.ERROR_MISSING_COMPONENT, typeof( CSlot ).ToString() ) );
+                continue;
+            }
+
+            // Attempt to find an empty slot.
+            if ( cSlot.SlotState == CSlot.ESlotState.STATE_EMPTY )
+            {
+                // We managed to find an empty slot, add the item info to the slot
+                //  and return true to indicate that we were successful.
+                cSlot.AddItemInfo( itemInfo );
+                return true;
+            }
+        }
+
+        // There are no available slots.
+        return false;
     }
 }
