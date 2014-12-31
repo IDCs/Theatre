@@ -23,6 +23,10 @@ public class CSlot : MonoBehaviour, IPointerDownHandler, IPointerEnterHandler {
     // The sprite.
     private Sprite m_spItemSprite;
 
+    // Default "Empty" sprite.
+    [ SerializeField ]
+    private Sprite m_spDefaultEmptySprite;
+
     // The slot state will dictate if we can store or drop items.
     [ SerializeField ]
     private ESlotState m_eSlotState = ESlotState.STATE_EMPTY;
@@ -43,6 +47,8 @@ public class CSlot : MonoBehaviour, IPointerDownHandler, IPointerEnterHandler {
             // The image component is missing, inform the user.
             Debug.LogError( string.Format( "{0} {1}: {2}", strFunction, ErrorStrings.ERROR_MISSING_COMPONENT, typeof( Image ).ToString() ) );
         }
+
+        m_imgItem.sprite = m_spDefaultEmptySprite;
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////
@@ -99,6 +105,7 @@ public class CSlot : MonoBehaviour, IPointerDownHandler, IPointerEnterHandler {
         // Indicate that the slot is now empty.
         m_eSlotState = ESlotState.STATE_EMPTY;
         m_cItemInfo = null;
+        m_imgItem.sprite = m_spDefaultEmptySprite;
     }
 
     /////////////////////////////////////////////////////////////////////////////
