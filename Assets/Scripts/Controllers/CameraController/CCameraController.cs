@@ -174,7 +174,8 @@ public class CCameraController : MouseLook {
 
             if ( true == bItemAdded )
             { 
-                // TODO: Generate a collected item event here.
+                // Call the object event.
+                cObject.ObjectEventCollected( cObject.InvItemInfo );
             
                 return true;
             }
@@ -305,6 +306,9 @@ public class CCameraController : MouseLook {
             return;
         }
 
+        // Call the dragged event.
+        cObject.ObjectEventDragged( m_goHeldObject );
+
         // Retrieve the object's attributes and ensure that we are able to drag
         //  the object.
         List< CObject.EObjectAttributes > liObjectAttributes = cObject.Attributes;
@@ -334,6 +338,14 @@ public class CCameraController : MouseLook {
         // Check if we're actually holding anything and return if we don't
         if ( null == m_goHeldObject )
             return;
+
+        // We want to get the object script of the currently held item in order
+        //  to call the dropped object event. We assume that a CObject component
+        //  is attached to the gameobject otherwise we wouldn't get this far.
+        CObject cObject = m_goHeldObject.GetComponent< CObject >();
+        
+        // Call the event.
+        cObject.ObjectEventDropped( cObject.InvItemInfo );
 
         // Remove the held object and reactivate physics.
         m_goHeldObject.rigidbody.useGravity = true;
