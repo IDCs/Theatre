@@ -16,4 +16,10 @@ public static class CustomMenuItems
     {
         ScriptableObjectUtility.CreateResource<DeceptionNarrative.SubtitledAudio>();
     }
+
+    [ MenuItem( DefaultPaths.SO_RESOURCES_PATH + DefaultPaths.SO_OBJECTS ) ]
+    public static void CreateObjectSO()
+    {
+        ScriptableObjectUtility.CreateResource< CObjectSO >( ResourcePacks.RESOURCE_CONTAINER_OBJECTS );
+    }
 }

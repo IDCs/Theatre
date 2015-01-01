@@ -93,9 +93,12 @@ public class CInventory : MonoBehaviour {
             Debug.LogError( string.Format( "{0} {1}: {2}", strFunction, ErrorStrings.ERROR_MISSING_COMPONENT, typeof( Animator ).ToString() ) );
         }
 
+        // Get a handle on the panel's rect transform object.
+        RectTransform rtPanel = this.GetComponent< RectTransform >();
+
         // Get the size of the panel itself so we can evenly distribute the slots 
         //  according to panel size.
-        Rect rcPanelSize = this.GetComponent< RectTransform >().rect;
+        Rect rcPanelSize = rtPanel.rect;
 
         // Calculate rectangle offset.
         float fWidth = rcPanelSize.width;
@@ -123,10 +126,13 @@ public class CInventory : MonoBehaviour {
                 return;
             }
 
-            goSlot.transform.parent = this.transform;
+            goSlot.transform.SetParent( this.transform );
 
             // Apply X offset.
             goSlot.GetComponent< RectTransform >().localPosition = new Vector3( fXOffset, 0f, 0f );
+
+            // Modify the slot size.
+            goSlot.GetComponent< RectTransform >().localScale = new Vector3( 1f, 3f, 1f );
 
             // Jump to the next ideal position.
             fXOffset += fWidth / Constants.DEFAULT_MAX_INVENTORY_SLOTS;
@@ -186,5 +192,39 @@ public class CInventory : MonoBehaviour {
             return m_dictHashStates[ iNameHash ];
 
         return EInventoryState.STATE_NONE;
+    }
+
+    /////////////////////////////////////////////////////////////////////////////
+    /// Function:               AddToInventory
+    /////////////////////////////////////////////////////////////////////////////
+    public bool AddToInventory( InventoryItemInfo itemInfo )
+    {
+        // Error reporting.
+        string strFunction = "CInventory::AddToInventory()";
+
+        // We're going to loop through all our slots and make sure that we have a free one.
+        foreach ( GameObject goSlot in m_liInventorySlots )
+        {
+            // Get a handle on the slot component and check if it's empty.
+            CSlot cSlot = goSlot.GetComponent< CSlot >();
+            if ( null == cSlot )
+            {
+                // The CSlot component is missing, jump to the next slot.
+                Debug.LogError( string.Format( "{0} {1}: {2}", strFunction, ErrorStrings.ERROR_MISSING_COMPONENT, typeof( CSlot ).ToString() ) );
+                continue;
+            }
+
+            // Attempt to find an empty slot.
+            if ( cSlot.SlotState == CSlot.ESlotState.STATE_EMPTY )
+            {
+                // We managed to find an empty slot, add the item info to the slot
+                //  and return true to indicate that we were successful.
+                cSlot.AddItemInfo( itemInfo );
+                return true;
+            }
+        }
+
+        // There are no available slots.
+        return false;
     }
 }

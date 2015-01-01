@@ -6,10 +6,27 @@ using Theatre;
 public class CCameraController : MouseLook {
 
     // Will hold the default position for all dragged objects.
-    private GameObject m_goDraggedObject = null;
+    private static GameObject m_goDraggedObject = null;
+    public static Vector3 HandsPosition 
+    { 
+        get 
+        { 
+            if ( null == m_goDraggedObject )
+            {
+                // This should never happen.
+                Debug.LogError( string.Format( "CCameraController::HandsPosition {0}: {1}", ErrorStrings.ERROR_NULL_OBJECT, "m_goDraggedObject" ) );
+                return Vector3.zero;
+            }
+
+            return m_goDraggedObject.transform.position; 
+        } 
+    }
 
     // Will hold a reference to the object which we're currently looking at.
     private GameObject m_goInteractableObject = null;
+
+    // Will hold a reference to the object which we're holding ( if any ).
+    private GameObject m_goHeldObject = null;
 
     // Will indicate if we want the script to run its drag logic.
     [ SerializeField ]
@@ -22,6 +39,8 @@ public class CCameraController : MouseLook {
     public bool AllowRotation { get { return m_bAllowRotation; } }
 
     private List< GameObject > m_liSceneryObjects = new List< GameObject >();
+
+    private float m_fClickTime = 0;
 
     /////////////////////////////////////////////////////////////////////////////
     /// Function:               Start
@@ -79,9 +98,8 @@ public class CCameraController : MouseLook {
     /////////////////////////////////////////////////////////////////////////////
     /// Function:               FixedUpdate
     /////////////////////////////////////////////////////////////////////////////
-    void FixedUpdate()
+    void FixedUpdate ()
     {
-
         // Run logic that reacts to mouse events.
         //  This may include physics manipulation, so we want to run this within
         //  the fixed update function.
@@ -94,33 +112,86 @@ public class CCameraController : MouseLook {
     /////////////////////////////////////////////////////////////////////////////
     /// Function:               CheckForMouseInput
     /////////////////////////////////////////////////////////////////////////////
-    private void CheckForMouseInput()
+    private void CheckForMouseInput ()
     {
         // Check for mouse input and react accordingly.
         if ( Input.GetMouseButtonDown( Controls.CONTROL_MOUSE_LEFT_BUTTON ) )
         {
+            // A click has occured, depending on 
+            m_fClickTime = Time.time;
+
             // Drag the interactable object.
             DragObject();
         }
         else if ( Input.GetMouseButtonUp( Controls.CONTROL_MOUSE_LEFT_BUTTON ) )
         {
             // We're not holding anything, return.
-            if ( null == m_goInteractableObject )
+            if ( null == m_goHeldObject )
                 return;
 
-            // Release the interactable object.
+            if ( m_fClickTime + 1f > Time.time )
+            {
+                // Attempt to add the item to inventory, AddToInventory will return
+                //  true or false depending if it succeeded.
+                bool bItemAdded = AddToInventory();
+
+                if ( true == bItemAdded )
+                { 
+                    // We managed to add the item to inventory, clean up and return.
+                    Destroy( m_goHeldObject );
+                    m_goHeldObject = null;
+
+                    return;
+                }
+            }
+
             ReleaseObject();
         }
     }
 
     /////////////////////////////////////////////////////////////////////////////
-    /// Function:               CheckForKeyboardInput
+    /// Function:               AddToInventory
     /////////////////////////////////////////////////////////////////////////////
-    private void CheckForKeyboardInput()
+    private bool AddToInventory ()
     {
-        // For error handling.
-        //string strFunction = "CCameraController::CheckForKeyboardInput()";
+        // Error reporting.
+        string strFunction = "CCameraController::AddToInventory()";
 
+        // We need to check the item's attributes and ensure that we can store it
+        //  in our inventory. It's safe to assume that we have a held object at this point
+        //  so we're not going to null check it.
+        CObject cObject = m_goHeldObject.GetComponent< CObject >();
+        if ( null == cObject )
+        {
+            Debug.LogError( string.Format( "{0} {1}: {2}", strFunction, ErrorStrings.ERROR_MISSING_COMPONENT, typeof( CObject ).ToString() ) );
+            return false;
+        }
+
+        // Check if the item is collectable.
+        if ( true == cObject.Attributes.Contains( CObject.EObjectAttributes.ATTRIBUTE_COLLECTABLE ) )
+        {
+            bool bItemAdded = CInventory.InventoryInstance.AddToInventory( cObject.InvItemInfo );
+
+            if ( true == bItemAdded )
+            { 
+                // TODO: Generate a collected item event here.
+            
+                return true;
+            }
+            else
+            {
+                // TODO: Inform the player that his inventory is full.
+            }
+        }
+
+        return false;
+    }
+
+    /////////////////////////////////////////////////////////////////////////////
+    /// Function:               RunRotationControls
+    /////////////////////////////////////////////////////////////////////////////
+    private void CheckRotationControls ()
+    {
         // We want to be able to rotate the held object if the X key is held down.
         if ( true == Input.GetKey( KeyCode.X ) )
         {
@@ -132,17 +203,11 @@ public class CCameraController : MouseLook {
                 rgMouseLookObjects[ i ].AllowRotation = false;
             }
 
-            // Get a handle on the item's rigidbody and ensure that gravity is disabled.
-            Rigidbody rbObject = m_goInteractableObject.rigidbody;
-            if ( null != rbObject )
-            {
-                rbObject.useGravity = false;
-            }
-
             // Disable collisions for all scenery objects.
             foreach ( GameObject goSceneryObject in m_liSceneryObjects )
             {
-                Physics.IgnoreCollision( goSceneryObject.collider, m_goInteractableObject.collider, true );
+                if ( goSceneryObject != m_goHeldObject )
+                    Physics.IgnoreCollision( goSceneryObject.collider, m_goHeldObject.collider, true );
             }
 
             // Disallow camera rotation.
@@ -157,19 +222,12 @@ public class CCameraController : MouseLook {
             v3Direction.Normalize();
 
             //rotate us over time according to speed until we are in the required rotation
-            m_goInteractableObject.transform.Rotate( v3Direction );
+            m_goHeldObject.transform.Rotate( v3Direction );
 
         }
         else if ( true == Input.GetKeyUp( KeyCode.X ) )
         {
             m_bAllowRotation = true;
-
-            // Get a handle on the item's rigidbody and ensure that gravity is enabled.
-            Rigidbody rbObject = m_goInteractableObject.rigidbody;
-            if ( null != rbObject )
-            {
-                rbObject.useGravity = true;
-            }
 
             // We're done rotating, we can re-enable camera rotation.
             MouseLook[] rgMouseLookObjects = GetComponentsInChildren< MouseLook >();
@@ -181,15 +239,26 @@ public class CCameraController : MouseLook {
             // Enable collisions for all scenery objects.
             foreach ( GameObject goSceneryObject in m_liSceneryObjects )
             {
-                Physics.IgnoreCollision( goSceneryObject.collider, m_goInteractableObject.collider, false );
+                if ( goSceneryObject != m_goHeldObject )
+                    Physics.IgnoreCollision( goSceneryObject.collider, m_goHeldObject.collider, false );
             }
         }
     }
 
     /////////////////////////////////////////////////////////////////////////////
+    /// Function:               CheckForKeyboardInput
+    /////////////////////////////////////////////////////////////////////////////
+    private void CheckForKeyboardInput ()
+    {
+        // Check if the user is trying to rotate a held object.
+        if ( null != m_goHeldObject )
+            CheckRotationControls();
+    }
+
+    /////////////////////////////////////////////////////////////////////////////
     /// Function:               SearchForInteractables
     /////////////////////////////////////////////////////////////////////////////
-    private void SearchForInteractables()
+    private void SearchForInteractables ()
     {
         // Check if we want the drag logic to run.
         if ( false == m_bRunDragLogic )
@@ -214,7 +283,7 @@ public class CCameraController : MouseLook {
     /////////////////////////////////////////////////////////////////////////////
     /// Function:               DragObject
     /////////////////////////////////////////////////////////////////////////////
-    void DragObject()
+    void DragObject ()
     {
         // For error reporting.
         string strFunction = "CCameraController::OnMouseDown()";
@@ -225,8 +294,11 @@ public class CCameraController : MouseLook {
         if ( null == m_goInteractableObject || false == m_bRunDragLogic || m_goInteractableObject.tag == Tags.TAG_SCENERY )
             return;
         
+        // We're now holding an item, keep a reference to it.
+        m_goHeldObject = m_goInteractableObject;
+
         // Get a handle on the object script
-        CObject cObject = m_goInteractableObject.GetComponent< CObject >();
+        CObject cObject = m_goHeldObject.GetComponent< CObject >();
         if ( null == cObject )
         {
             Debug.LogError( string.Format( "{0} {1}: {2}", strFunction, ErrorStrings.ERROR_MISSING_COMPONENT, typeof( CObject ).ToString() ) );
@@ -253,21 +325,20 @@ public class CCameraController : MouseLook {
     /////////////////////////////////////////////////////////////////////////////
     /// Function:               ReleaseObject
     /////////////////////////////////////////////////////////////////////////////
-    void ReleaseObject()
+    void ReleaseObject ()
     {
         // Check if the drag logic is enabled before we proceed
-        if ( false == m_bRunDragLogic || m_goInteractableObject.tag == Tags.TAG_SCENERY )
+        if ( false == m_bRunDragLogic )
             return;
 
-        // Retrieve the held objects ( This should be only 1 object )
-        Transform[] rgtrObjects = m_goDraggedObject.GetComponentsInChildren< Transform >();
-
         // Check if we're actually holding anything and return if we don't
-        if ( 0 == rgtrObjects.Length )
+        if ( null == m_goHeldObject )
             return;
 
         // Remove the held object and reactivate physics.
-        m_goInteractableObject.rigidbody.useGravity = true;
-        m_goInteractableObject.transform.parent = null;
+        m_goHeldObject.rigidbody.useGravity = true;
+        m_goHeldObject.transform.parent = null;
+
+        m_goHeldObject = null;
     }
 }

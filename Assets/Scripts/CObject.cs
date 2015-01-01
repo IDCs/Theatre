@@ -57,6 +57,11 @@ public class CObject : MonoBehaviour {
     [ SerializeField ]
     private Sprite m_spItemSprite = null;
 
+    // Object Events.
+    public System.Action< GameObject > OnObjectDragged { get; set; }
+    public System.Action< InventoryItemInfo > OnObjectCollected { get; set; }
+    public System.Action< InventoryItemInfo > OnObjectDropped { get; set; }
+
     /////////////////////////////////////////////////////////////////////////////
     /// Function:               Start
     /////////////////////////////////////////////////////////////////////////////
@@ -125,7 +130,6 @@ public class CObject : MonoBehaviour {
 
             // Initiate the inventory item.
             m_cInventoryItemInfo = new InventoryItemInfo{ m_iObjectId = this.m_iObjectID, 
-                                                          m_goItemPrefab = this.m_goItemPrefab, 
                                                           m_strDescription = m_dictDescriptionMap[ gameObject.name ], 
                                                           m_strName = gameObject.name, 
                                                           m_spSprite = this.m_spItemSprite };
@@ -148,6 +152,39 @@ public class CObject : MonoBehaviour {
     void RunObjectLogic()
     {
     }
+
+    /////////////////////////////////////////////////////////////////////////////
+    /// Function:               ObjectEventDragged
+    /////////////////////////////////////////////////////////////////////////////
+    public void ObjectEventDragged( GameObject goObject )
+    {
+        if( null != OnObjectDragged )
+        {
+            OnObjectDragged( goObject );
+        }
+    }
+
+    /////////////////////////////////////////////////////////////////////////////
+    /// Function:               ObjectEventCollected
+    /////////////////////////////////////////////////////////////////////////////
+    public void ObjectEventCollected( InventoryItemInfo itemInfo )
+    {
+        if ( null != OnObjectCollected )
+        {
+            OnObjectCollected( itemInfo );
+        }
+    }
+
+    /////////////////////////////////////////////////////////////////////////////
+    /// Function:               ObjectEventDropped
+    /////////////////////////////////////////////////////////////////////////////
+    public void ObjectEventDropped( InventoryItemInfo itemInfo )
+    {
+        if ( null != OnObjectDropped )
+        {
+            OnObjectDropped( itemInfo );
+        }
+    }
 }
 
 public class InventoryItemInfo
@@ -160,9 +197,6 @@ public class InventoryItemInfo
 
     // Will hold the item's description.
     public string m_strDescription;
-
-    // Will hold the item prefab so we can instantiate it in the world.
-    public GameObject m_goItemPrefab = null;
 
     // The item sprite for the UI.
     public Sprite m_spSprite;
