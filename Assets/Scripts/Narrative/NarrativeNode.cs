@@ -96,11 +96,11 @@ namespace DeceptionNarrative
                     Gizmos.DrawLine(transform.position, node.transform.position);
 
                     Vector3 toChild = transform.position - node.transform.position;
-                    Vector3 childIconPoint = transform.position - toChild * 0.3f;
-                    Vector3 parentIconPoint = node.transform.position + toChild * 0.3f;
+                    Vector3 childIconPoint = transform.position - toChild * 0.25f;
+                    Vector3 parentIconPoint = node.transform.position + toChild * 0.25f;
 
-                    Gizmos.DrawIcon(childIconPoint, "C.png", false);
-                    Gizmos.DrawIcon(parentIconPoint, "P.png", false);
+                    Gizmos.DrawIcon(childIconPoint, "C.png");
+                    Gizmos.DrawIcon(parentIconPoint, "P.png");
                 }
             }
         }
