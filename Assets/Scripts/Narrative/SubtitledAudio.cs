@@ -18,7 +18,7 @@ namespace DeceptionNarrative
 
         // Time when last subtitles line started
         private float lastLineTime;
-        private float endPadding = 3f; // Time hold the last line for
+        private float endPadding = 2f; // Time hold the last line for
 
         private void Start()
         {
@@ -28,7 +28,8 @@ namespace DeceptionNarrative
         // Play the clip with subtitles. Supply SudioSource to play the sounds and method to call with content of current subtitles line
         public IEnumerator Play(AudioSource audioSource, System.Action<string> subtitlesCallback)
         {
-            audioSource.PlayOneShot(audioClip);
+            audioSource.clip = audioClip;
+            audioSource.Play();
 
             // Display the subtitles at set times
             foreach (SubtitlesLine line in subtitles)
@@ -43,12 +44,12 @@ namespace DeceptionNarrative
             {
                 yield return new WaitForSeconds(audioSource.clip.length - audioSource.time);
             }
-            else
-            {
-                yield return new WaitForSeconds(endPadding);
-            }
+
+            // Add padding between clips
+            yield return new WaitForSeconds(endPadding);
+
 
             audioSource.clip = null;
         }
-    } 
+    }
 }
