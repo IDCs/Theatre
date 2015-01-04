@@ -15,6 +15,9 @@ namespace DeceptionNarrative
         [SerializeField]
         private NarrativeNode[] prerequisites = null;
 
+        // Emitted when all prerequisites are active, or at start if there are no prerequisites
+        public System.Action OnNodeCanBeTriggered { get; set; }
+
         // Was this node previosuly triggered
         public bool Triggered { get; private set; }
         // Called when this node triggers
@@ -46,11 +49,42 @@ namespace DeceptionNarrative
             }
         }
 
+        private void Start()
+        {
+            // If there are no prerequisites emit event to signal readiness
+            if(prerequisites.Length == 0 && OnNodeCanBeTriggered != null)
+            {
+                OnNodeCanBeTriggered();
+            }
+            // Otherwise listen for prerequisites triggering
+            else
+            {
+                foreach(NarrativeNode node in prerequisites)
+                {
+                    node.OnNodeTriggered += PrerequisiteTriggered;
+                }
+            }
+        }
+
+        // Called when a prerequisite was triggered
+        private void PrerequisiteTriggered()
+        {
+            if (ArePrerequisitesTriggered() && OnNodeCanBeTriggered != null)
+            {
+                OnNodeCanBeTriggered();
+            }
+        }
+
+        public bool ArePrerequisitesTriggered()
+        {
+            return prerequisites.Length == 0 || prerequisites.All(p => p.Triggered);
+        }
+
         // Let the node know that the assigned trigger has been activated
         public void TriggerActivated()
         {
             // If the node wasn't previously triggered and all prerequisites have triggered, push the contents onto the queue to be played
-            if (!Triggered && prerequisites.All(p => p.Triggered))
+            if (!Triggered && ArePrerequisitesTriggered())
             {
                 // Send out the trigger event
                 Triggered = true;
