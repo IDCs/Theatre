@@ -15,6 +15,7 @@ public class GameController : MonoBehaviour
     public static GameController Controller { get; private set; }
     
     public System.Action<string> OnSubtitlesEvent { get; set; } // Called every time a narrative event passes subtitles to be displayed
+    public System.Action<string> OnPromptEvent { get; set; } // Called every time an object passes a prompt to be displayed
 
     private void Awake()
     {
@@ -56,6 +57,14 @@ public class GameController : MonoBehaviour
         if(OnSubtitlesEvent != null)
         {
             OnSubtitlesEvent(text);
+        }
+    }
+
+    public void InteractionPromptToDisplay(string text)
+    {
+        if(OnPromptEvent != null)
+        {
+            OnPromptEvent(text);
         }
     }
 }
