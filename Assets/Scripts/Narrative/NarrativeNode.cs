@@ -16,7 +16,7 @@ namespace DeceptionNarrative
         private NarrativeNode[] prerequisites = null;
 
         // Emitted when all prerequisites are active, or at start if there are no prerequisites
-        public System.Action OnNodeCanBeTriggered { get; set; }
+        public System.Action OnAllPrerequisitesTriggered { get; set; }
 
         // Was this node previosuly triggered
         public bool Triggered { get; private set; }
@@ -52,9 +52,9 @@ namespace DeceptionNarrative
         private void Start()
         {
             // If there are no prerequisites emit event to signal readiness
-            if(prerequisites.Length == 0 && OnNodeCanBeTriggered != null)
+            if(prerequisites.Length == 0 && OnAllPrerequisitesTriggered != null)
             {
-                OnNodeCanBeTriggered();
+                OnAllPrerequisitesTriggered();
             }
             // Otherwise listen for prerequisites triggering
             else
@@ -69,9 +69,9 @@ namespace DeceptionNarrative
         // Called when a prerequisite was triggered
         private void PrerequisiteTriggered()
         {
-            if (ArePrerequisitesTriggered() && OnNodeCanBeTriggered != null)
+            if (ArePrerequisitesTriggered() && OnAllPrerequisitesTriggered != null)
             {
-                OnNodeCanBeTriggered();
+                OnAllPrerequisitesTriggered();
             }
         }
 

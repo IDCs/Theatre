@@ -29,7 +29,7 @@ namespace DeceptionNarrative
             }
             // else listen for the ready state
             {
-                narrativeNode.OnNodeCanBeTriggered += ActivatePuzzle;
+                narrativeNode.OnAllPrerequisitesTriggered += ActivatePuzzle;
             }
         }
 

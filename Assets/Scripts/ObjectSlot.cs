@@ -178,8 +178,8 @@ namespace DeceptionPuzzle
             if (attachedObject != null)
             {
                 // Register for object pickup events
-                removedDelegate += (info) => DetachObject();
-                draggedOffDelegate += (go) => DetachObject();
+                removedDelegate = (info) => DetachObject();
+                draggedOffDelegate = (go) => DetachObject();
 
                 attachedObject.OnObjectCollected += removedDelegate;
                 attachedObject.OnObjectDragged += draggedOffDelegate;
